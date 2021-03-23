@@ -1,3 +1,5 @@
+// Package table defines an interface for defining and using table columns for printing,
+// and two implementations:  fixed-width and CSV.
 package table
 
 type Alignment int
@@ -5,7 +7,6 @@ type Alignment int
 const (
 	Left  Alignment = 0
 	Right Alignment = 1
-	// Center Alignment = 2
 )
 
 // Specifies a column, including static column description, and current data.
