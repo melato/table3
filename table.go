@@ -8,17 +8,17 @@ const (
 	// Center Alignment = 2
 )
 
-/** Specifies a column, including static column description, and current data. */
+// Specifies a column, including static column description, and current data.
 type Column struct {
-	/** The display name of the column */
+	// The display name of the column
 	Name string
-	/** Internal column identifier, defaults to Name */
+	// Internal column identifier, defaults to Name
 	Identifier string
-	/** The value of the column for the current row, when called by Writer.Write().  It will be converted to a string using fmt %v.   */
+	// The value of the column for the current row, when called by Writer.Write().  It will be converted to a string using fmt %v.
 	Value func() interface{}
-	/** Alignment: Left or Right */
+	// Alignment: Left or Right
 	Alignment Alignment
-	/** optional column description */
+	// optional column description
 	Description string
 }
 
@@ -41,14 +41,14 @@ func (c *Column) Id(id string) *Column {
 	return c
 }
 
-/** Interface for writing tabular data */
+// Interface for writing tabular data
 type Writer interface {
-	/** Specify the columns */
+	// Specify the columns
 	Columns(...*Column)
-	/** Write the header.  May be called multiple times.  */
+	// Write the header.  May be called multiple times.
 	//WriteHeader()
-	/** Write the current row.  */
+	// Write the current row.
 	WriteRow()
-	/** End writing.  Flush or close files. */
+	// End writing.  Flush or close files.
 	End()
 }
