@@ -3,6 +3,7 @@ package table
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -38,6 +39,9 @@ func (t *FixedWriter) WriteRow() {
 }
 
 func (t *FixedWriter) End() {
+	if t.Writer == nil {
+		t.Writer = os.Stdout
+	}
 	if t.Footer {
 		t.WriteHeader()
 	}
