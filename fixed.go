@@ -38,6 +38,15 @@ func (t *FixedWriter) WriteRow() {
 	t.rows = append(t.rows, row)
 }
 
+// width - return the number of unicode characters in the string.
+func width(s string) int {
+	var w int
+	for _, _ = range s {
+		w++
+	}
+	return w
+}
+
 func (t *FixedWriter) End() {
 	if t.Writer == nil {
 		t.Writer = os.Stdout
@@ -49,7 +58,7 @@ func (t *FixedWriter) End() {
 	widths := make([]int, len(t.columns))
 	for _, row := range t.rows {
 		for j, s := range row {
-			w := len(s)
+			w := width(s)
 			if w > widths[j] {
 				widths[j] = w
 			}
