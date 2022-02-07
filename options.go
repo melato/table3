@@ -2,6 +2,7 @@ package table
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -9,19 +10,23 @@ type Options struct {
 	Format string `name:"format" usage:"table format: csv|fixed"`
 }
 
-func (opt *Options) NewWriter() (Writer, error) {
-	var w Writer
+func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
+	var writer Writer
 	format := opt.Format
 	if format == "" {
 		format = "fixed"
 	}
 	switch format {
 	case "csv":
-		w = NewCsvWriter(os.Stdout)
+		writer = NewCsvWriter(w)
 	case "fixed":
-		w = &FixedWriter{Writer: os.Stdout}
+		writer = &FixedWriter{Writer: os.Stdout}
 	default:
 		return nil, fmt.Errorf("unknown format: %s", opt.Format)
 	}
-	return w, nil
+	return writer, nil
+}
+
+func (opt *Options) NewWriter() (Writer, error) {
+	return opt.NewWriterf(os.Stdout)
 }
