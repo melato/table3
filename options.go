@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 type Options struct {
@@ -29,4 +30,21 @@ func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
 
 func (opt *Options) NewWriter() (Writer, error) {
 	return opt.NewWriterf(os.Stdout)
+}
+
+func (opt *Options) NewWriterWithColumns(columnSpec string, allColumns ...*Column) (Writer, error) {
+	w, err := opt.NewWriterf(os.Stdout)
+	if err != nil {
+		return nil, err
+	}
+	columns := allColumns
+	if columnSpec != "" {
+		columns, err = SelectColumns(allColumns, strings.Split(columnSpec, ",")...)
+		if err != nil {
+			PrintColumns(allColumns)
+			return nil, err
+		}
+	}
+	w.Columns(columns...)
+	return w, nil
 }
