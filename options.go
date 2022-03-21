@@ -14,6 +14,7 @@ type Options struct {
 type FullOptions struct {
 	Options
 	Columns string `name:"columns" usage:"comma-separated list of columns to use"`
+	columns []string
 }
 
 func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
@@ -55,13 +56,14 @@ func (opt *Options) NewWriterWithColumns(columnSpec string, allColumns ...*Colum
 }
 
 func (opt *FullOptions) NewWriter(allColumns ...*Column) (Writer, error) {
+	opt.columns = strings.Split(opt.Columns, ",")
 	w, err := opt.NewWriterf(os.Stdout)
 	if err != nil {
 		return nil, err
 	}
 	columns := allColumns
 	if opt.Columns != "" {
-		columns, err = SelectColumns(allColumns, strings.Split(opt.Columns, ",")...)
+		columns, err = SelectColumns(allColumns, opt.columns...)
 		if err != nil {
 			PrintColumns(allColumns)
 			return nil, err
@@ -69,4 +71,13 @@ func (opt *FullOptions) NewWriter(allColumns ...*Column) (Writer, error) {
 	}
 	w.Columns(columns...)
 	return w, nil
+}
+
+func (opt *FullOptions) HasColumn(name string) bool {
+	for _, col := range opt.columns {
+		if col == name {
+			return true
+		}
+	}
+	return false
 }
