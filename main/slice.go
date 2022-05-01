@@ -6,15 +6,21 @@ import (
 	table "melato.org/table3"
 )
 
-type T struct {
+type S struct {
 	A string `name:"a"`
 	B int    `name:"b"`
 }
 
+type C struct {
+	S
+	D string `name:"d"`
+	E int    `name:"e"`
+}
+
 func main() {
-	list := []*T{
-		&T{"a", 1},
-		&T{"b", 2},
+	list := []*C{
+		&C{S{"x", 3}, "a", 1},
+		&C{S{"y", 4}, "b", 2},
 	}
 	var options table.FullOptions
 	err := options.PrintSlice(list, "name")

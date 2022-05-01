@@ -6,12 +6,18 @@ import (
 	table "melato.org/table3"
 )
 
-type T struct {
+type S struct {
 	A string `name:"a"`
 	B int    `name:"b"`
 }
 
-func printList(list []*T) error {
+type C struct {
+	S
+	D string `name:"d"`
+	E int    `name:"e"`
+}
+
+func printList[T comparable](list []*T) error {
 	var options table.FullOptions
 	var v *T
 	columns, err := table.StructColumns(v, "name", func() interface{} { return v })
@@ -30,12 +36,25 @@ func printList(list []*T) error {
 }
 
 func main() {
-	list := []*T{
-		&T{"a", 1},
-		&T{"b", 2},
+	var err error
+	if true {
+		list1 := []*S{
+			&S{"a", 1},
+			&S{"b", 2},
+		}
+		err = printList[S](list1)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+		}
 	}
-	err := printList(list)
-	if err != nil {
-		fmt.Printf("%v\n", err)
+	if true {
+		list2 := []*C{
+			&C{S{"x", 3}, "a", 1},
+			&C{S{"y", 4},"b", 2},
+		}
+		err = printList[C](list2)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+		}
 	}
 }
