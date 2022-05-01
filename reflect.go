@@ -45,3 +45,25 @@ func StructColumns(proto interface{}, nameTag string, row func() interface{}) ([
 	}
 	return columns, nil
 }
+
+func (opt *FullOptions) PrintSlice(slice interface{}, nameTag string) error {
+	sliceType := reflect.TypeOf(slice)
+	if sliceType.Kind() != reflect.Slice {
+		return fmt.Errorf("not a slice: %v", sliceType)
+	}
+	sliceValue := reflect.ValueOf(slice)
+	proto := reflect.Zero(sliceType.Elem())
+	var v interface{}
+	columns, err := StructColumns(proto.Interface(), nameTag, func() interface{} { return v })
+	w, err := opt.NewWriter(columns...)
+	if err != nil {
+		return err
+	}
+	n := sliceValue.Len()
+	for i := 0; i < n; i++ {
+		v = sliceValue.Index(i).Interface()
+		w.WriteRow()
+	}
+	w.End()
+	return nil
+}
