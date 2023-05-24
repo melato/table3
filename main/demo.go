@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	writer := &table.FixedWriter{Writer: os.Stdout}
+	writer := &table.FixedWriterSingle{Writer: os.Stdout}
 	var a string
 	var b float32
 	writer.Columns(
