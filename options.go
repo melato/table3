@@ -27,7 +27,9 @@ func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
 	case "csv":
 		writer = NewCsvWriter(w)
 	case "fixed":
-		writer = &FixedWriter{Writer: os.Stdout}
+		writer = &FixedWriter{Writer: w}
+	case "fixed-onepass":
+		writer = &FixedWriterSingle{Writer: w}
 	default:
 		return nil, fmt.Errorf("unknown format: %s", opt.Format)
 	}
@@ -55,9 +57,9 @@ func (opt *Options) NewWriterWithColumns(columnSpec string, allColumns ...*Colum
 	return w, nil
 }
 
-func (opt *FullOptions) NewWriter(allColumns ...*Column) (Writer, error) {
+func (opt *FullOptions) NewWriterf(out io.Writer, allColumns ...*Column) (Writer, error) {
 	opt.columns = strings.Split(opt.Columns, ",")
-	w, err := opt.NewWriterf(os.Stdout)
+	w, err := opt.Options.NewWriterf(out)
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +73,10 @@ func (opt *FullOptions) NewWriter(allColumns ...*Column) (Writer, error) {
 	}
 	w.Columns(columns...)
 	return w, nil
+}
+
+func (opt *FullOptions) NewWriter(allColumns ...*Column) (Writer, error) {
+	return opt.NewWriterf(os.Stdout, allColumns...)
 }
 
 func (opt *FullOptions) HasColumn(name string) bool {
