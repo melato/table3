@@ -8,7 +8,7 @@ import (
 )
 
 type Options struct {
-	Format string `name:"format" usage:"table format: csv|fixed"`
+	Format string `name:"format" usage:"table format: csv|fixed|json"`
 }
 
 type FullOptions struct {
@@ -30,6 +30,8 @@ func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
 		writer = &FixedWriter{Writer: w}
 	case "fixed-onepass":
 		writer = &FixedWriterSingle{Writer: w}
+	case "json":
+		writer = &JsonWriter{Writer: w}
 	default:
 		return nil, fmt.Errorf("unknown format: %s", opt.Format)
 	}
