@@ -12,7 +12,7 @@ type JsonWriter struct {
 }
 
 func (t *JsonWriter) End() {
-	data, _ := json.Marshal(t.rows)
+	data, _ := json.MarshalIndent(t.rows, "", " ")
 	t.Writer.Write(data)
 }
 
