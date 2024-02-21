@@ -1,7 +1,6 @@
 package table
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -18,24 +17,11 @@ type FullOptions struct {
 }
 
 func (opt *Options) NewWriterf(w io.Writer) (Writer, error) {
-	var writer Writer
 	format := opt.Format
 	if format == "" {
 		format = "fixed"
 	}
-	switch format {
-	case "csv":
-		writer = NewCsvWriter(w)
-	case "fixed":
-		writer = &FixedWriter{Writer: w}
-	case "fixed-onepass":
-		writer = &FixedWriterSingle{Writer: w}
-	case "json":
-		writer = &JsonWriter{Writer: w}
-	default:
-		return nil, fmt.Errorf("unknown format: %s", opt.Format)
-	}
-	return writer, nil
+	return NewWriterf(format, w)
 }
 
 func (opt *Options) NewWriter() (Writer, error) {
