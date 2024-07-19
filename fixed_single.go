@@ -18,6 +18,8 @@ type FixedWriterSingle struct {
 	columns   []*Column
 	widths    []int
 	format    string
+	rows      [][]string
+	count     int
 }
 
 func (t *FixedWriterSingle) Columns(columns ...*Column) {
@@ -27,19 +29,37 @@ func (t *FixedWriterSingle) Columns(columns ...*Column) {
 	}
 }
 
-func (t *FixedWriterSingle) WriteHeader() {
-	n := len(t.columns)
+type fixedFormat struct {
+}
+
+func (t *fixedFormat) computeWidths(rows [][]string) []int {
+	if len(rows) == 0 {
+		return nil
+	}
+	n := len(rows[0])
 	widths := make([]int, n)
+	for _, row := range rows {
+		for j, s := range row {
+			w := width(s)
+			if w > widths[j] {
+				widths[j] = w
+			}
+		}
+	}
+	return widths
+}
+
+func (t *FixedWriterSingle) computeFormats() {
+	var format fixedFormat
+	widths := format.computeWidths(t.rows)
+
+	n := len(widths)
 	formats := make([]string, n+1)
 	formats[n] = "\n"
 
-	row := make([]string, len(t.columns))
-	for i, col := range t.columns {
-		row[i] = col.Name
-		w := width(col.Name)
-		widths[i] = w
+	for i, w := range widths {
 		var format string
-		if col.Alignment == Right {
+		if i < len(t.columns) && t.columns[i].Alignment == Right {
 			format = fmt.Sprintf("%%%ds", w)
 		} else {
 			if i == len(t.columns)-1 {
@@ -52,7 +72,30 @@ func (t *FixedWriterSingle) WriteHeader() {
 	}
 	t.widths = widths
 	t.format = strings.Join(formats, " ")
-	t.write(row)
+}
+
+func (t *FixedWriterSingle) addRow(row []string) {
+	t.count += 1
+	switch t.count {
+	case 1:
+		t.rows = append(t.rows, row)
+	case 2:
+		t.rows = append(t.rows, row)
+		t.computeFormats()
+		for _, row := range t.rows {
+			t.write(row)
+		}
+	default:
+		t.write(row)
+	}
+}
+
+func (t *FixedWriterSingle) WriteHeader() {
+	row := make([]string, len(t.columns))
+	for i, col := range t.columns {
+		row[i] = col.Name
+	}
+	t.addRow(row)
 }
 
 func (t *FixedWriterSingle) WriteRow() {
@@ -60,7 +103,7 @@ func (t *FixedWriterSingle) WriteRow() {
 	for i, col := range t.columns {
 		row[i] = fmt.Sprintf("%v", col.Value())
 	}
-	t.write(row)
+	t.addRow(row)
 }
 
 func (t *FixedWriterSingle) End() {
