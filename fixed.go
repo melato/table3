@@ -64,7 +64,7 @@ func (t *FixedWriter) End() {
 			}
 		}
 	}
-	formats := make([]string, n+1)
+	formats := make([]string, n)
 	for i, c := range t.columns {
 		w := widths[i]
 		if c.Alignment == Right {
@@ -77,8 +77,7 @@ func (t *FixedWriter) End() {
 			}
 		}
 	}
-	formats[n] = "\n"
-	format := strings.Join(formats, " ")
+	format := strings.Join(formats, " ") + "\n"
 	irow := make([]interface{}, len(t.columns))
 	for _, row := range t.rows {
 		for j, s := range row {
